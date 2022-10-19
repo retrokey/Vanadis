@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ESNext",
+        "removeComments": true,
+        "importHelpers": true,
+        "moduleResolution": "node",
+        "strictNullChecks": false,
+        "resolveJsonModule": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "outDir": "dist",
+        "types": [
+            "node",
+            "express",
+            "bcrypt",
+            "csurf"
+        ],
+        "lib": [
+            "ES2017",
+            "ES2021",
+			"DOM",
+            "ScriptHost"
+        ]
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "include": [
+        "src"
+    ]
+}
