@@ -13,8 +13,7 @@
         "types": [
             "node",
             "express",
-            "bcrypt",
-            "csurf"
+            "bcrypt"
         ],
         "lib": [
             "ES2017",
