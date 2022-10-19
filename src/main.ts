@@ -8,7 +8,7 @@ process.title = 'Vanadis';
 async function bootstrap(): Promise<void> {
     const logger: Logger = new Logger('VanadisIntroducer');
     logger.log('Vanadis - NestJS Engine');
-    logger.log('Vanadis - v1.0.0 - By Cosimo Celeste');
+    logger.log('Vanadis - v1.0.0 - By RealCosis');
 
     let vanadis: INestApplication = await NestFactory.create(VanadisModule);
 
