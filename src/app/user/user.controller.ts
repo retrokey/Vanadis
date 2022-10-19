@@ -1,5 +1,4 @@
 import * as bcrypt from 'bcrypt';
-import * as moment from 'moment';
 import { Controller, Body, Req, Res, Header, Post, Get } from '@nestjs/common';
 import { Response } from 'express';
 import { DatabaseProvider } from '../database/database.provider';
