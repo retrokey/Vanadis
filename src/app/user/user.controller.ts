@@ -21,7 +21,6 @@ export class UserController {
     }
 
     @Post('/get')
-    @Header('accept', 'application/json')
     @Header('content-type', 'application/json')
     public async getUser(@Body() body: UserLoginDto, @Res() res: Response): Promise<void> {
         if (body == null) {
@@ -78,7 +77,6 @@ export class UserController {
     }
 
     @Get('/get/rank')
-    @Header('accept', 'application/json')
     @Header('content-type', 'application/json')
     public async getStaff(@Req() req: Request, @Res() res: Response): Promise<void> {
         if (req.headers['requested-rank'] == undefined) {
@@ -114,7 +112,6 @@ export class UserController {
     }
 
     @Get('/get/profile')
-    @Header('accept', 'application/json')
     @Header('content-type', 'application/json')
     public async getProfile(@Req() req: Request, @Res() res: Response): Promise<void> {
         if (req.headers['requested-user'] == undefined) {
