@@ -48,6 +48,7 @@ export class UserController {
                 'avatar',
                 'mission',
                 'role',
+                'rank',
                 'status'
             ]
         });
@@ -129,7 +130,6 @@ export class UserController {
                 'currency'
             ],
             select: [
-                'SSO',
                 'accountId',
                 'nickname',
                 'credits',
