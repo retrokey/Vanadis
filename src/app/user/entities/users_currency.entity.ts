@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, PrimaryColumn, Index, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 import { UserEntity } from './user.entity';
 
 @Entity('users_currency')

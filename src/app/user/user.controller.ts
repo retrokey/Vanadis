@@ -86,7 +86,7 @@ export class UserController {
             return;
         }
 
-        const user: UserEntity[] = await this._databaseProvider.connection.getRepository(UserEntity).find({
+        const user: Array<UserEntity> = await this._databaseProvider.connection.getRepository(UserEntity).find({
             where: {
                 rank: parseInt(req.headers['requested-rank'])
             },
@@ -107,7 +107,7 @@ export class UserController {
         }
 
         const result: GetStaff = {
-            staffs: user
+            staffer: user
         };
         res.statusCode = 200;
         res.send(ResponseUtils.sendStaff(result));

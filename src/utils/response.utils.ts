@@ -1,3 +1,4 @@
+import { GetPermission } from '../app/permission/types/getpermisison.type';
 import { GetProfile } from '../app/user/types/getprofile.type';
 import { GetStaff } from '../app/user/types/getstaff.type';
 import { GetUser } from '../app/user/types/getuser.type';
@@ -17,13 +18,22 @@ export class ResponseUtils {
         }, null, 3);
     }
 
+    public static sendPermission(json: GetPermission) {
+        let pretty: ResponseType = {
+            status: 'success',
+            response: json
+        };
+
+        return JSON.stringify({
+            status: pretty.status,
+            data: pretty.response
+        }, null, 3);  
+    }
+
     public static sendProfile(json: GetProfile) {
         let pretty: ResponseType = {
             status: 'success',
-            response: {
-                'registration': json.registration,
-                'user': json.user
-            }
+            response: json
         };
 
         return JSON.stringify({
@@ -35,11 +45,7 @@ export class ResponseUtils {
     public static sendUser(json: GetUser) {
         let pretty: ResponseType = {
             status: 'success',
-            response: {
-                'message': json.message,
-                'sso': json.sso,
-                'user': json.user
-            }
+            response: json
         };
 
         return JSON.stringify({
@@ -51,9 +57,7 @@ export class ResponseUtils {
     public static sendStaff(json: GetStaff) {
         let pretty: ResponseType = {
             status: 'success',
-            response: {
-                'staffer': json.staffs
-            }
+            response: json
         };
 
         return JSON.stringify({

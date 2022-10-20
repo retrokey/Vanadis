@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { ConfigProvider } from '../config/config.provider';
+import { PermissionEntity } from '../permission/entities/permission.entity';
 import { UserEntity } from '../user/entities/user.entity';
 import { UserCurrencyEntity } from '../user/entities/users_currency.entity';
 
@@ -30,7 +31,8 @@ export class DatabaseProvider {
             supportBigNumbers: true,
             entities: [
                 UserEntity,
-                UserCurrencyEntity
+                UserCurrencyEntity,
+                PermissionEntity
             ]
         }).initialize();
     }
