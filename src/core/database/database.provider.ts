@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { ConfigProvider } from '../config/config.provider';
 import { PermissionEntity } from '../../app/permission/entities/permission.entity';
 import { UserEntity } from '../../app/user/entities/user.entity';
 import { UserCurrencyEntity } from '../../app/user/entities/users_currency.entity';
-import { ConfigProvider } from '../config/config.provider';
 
 @Injectable()
 export class DatabaseProvider {

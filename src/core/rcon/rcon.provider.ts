@@ -1,10 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Socket } from 'net';
 import { ConfigProvider } from '../config/config.provider';
 
 @Injectable()
 export class RCONProvider {
-    private readonly _logger: Logger = new Logger('RCONProvider');
     private readonly _configProvider: ConfigProvider;
     private _client: Socket;
 
