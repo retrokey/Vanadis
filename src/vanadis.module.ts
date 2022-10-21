@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from './app/config/config.module';
-import { PermissionModule } from './app/permission/permission.module';
-import { RCONModule } from './app/rcon/rcon.module';
+import { RCONModule } from './core/rcon/rcon.module';
 import { UserModule } from './app/user/user.module';
+import { PermissionModule } from './app/permission/permission.module';
 
 @Module({
     imports: [
-        ConfigModule,
         RCONModule,
         UserModule,
         PermissionModule

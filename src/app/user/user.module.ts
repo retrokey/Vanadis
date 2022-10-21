@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '../config/config.module';
-import { DatabaseModule } from '../database/database.module';
-import { RCONModule } from '../rcon/rcon.module';
+import { ConfigModule } from '../../core/config/config.module';
+import { DatabaseModule } from '../../core/database/database.module';
+import { RCONModule } from '../../core/rcon/rcon.module';
 import { UserController } from './user.controller';
 
 @Module({

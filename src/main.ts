@@ -1,7 +1,7 @@
 import { INestApplication, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { VanadisModule } from './vanadis.module';
-import { ConfigProvider } from './app/config/config.provider';
+import { ConfigProvider } from './core/config/config.provider';
 import helmet from 'helmet';
 
 process.title = 'Vanadis';

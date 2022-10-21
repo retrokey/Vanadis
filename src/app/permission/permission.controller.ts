@@ -1,6 +1,6 @@
-import { Controller, Res, Header, Get, Param } from '@nestjs/common';
 import { Response } from 'express';
-import { DatabaseProvider } from '../database/database.provider';
+import { Controller, Res, Header, Get, Param } from '@nestjs/common';
+import { DatabaseProvider } from '../../core/database/database.provider';
 import { ResponseUtils } from '../../utils/response.utils';
 import { PermissionEntity } from './entities/permission.entity';
 import { GetPermission } from './types/getpermisison.type';

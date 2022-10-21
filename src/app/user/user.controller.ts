@@ -1,15 +1,15 @@
 import * as bcrypt from 'bcrypt';
-import { Controller, Body, Req, Res, Header, Post, Get } from '@nestjs/common';
 import { Response } from 'express';
-import { DatabaseProvider } from '../database/database.provider';
+import { Controller, Body, Req, Res, Header, Post, Get } from '@nestjs/common';
+import { ConfigProvider } from '../../core/config/config.provider';
+import { DatabaseProvider } from '../../core/database/database.provider';
+import { RCONProvider } from '../../core/rcon/rcon.provider';
 import { ResponseUtils } from '../../utils/response.utils';
-import { ConfigProvider } from '../config/config.provider';
-import { UserLoginDto } from '../../dto/user.dto';
+import { UserLoginDto } from './user.dto';
 import { UserEntity } from './entities/user.entity';
 import { GetUser } from './types/getuser.type';
 import { GetStaff } from './types/getstaff.type';
 import { GetProfile } from './types/getprofile.type';
-import { RCONProvider } from '../rcon/rcon.provider';
 
 @Controller('/users')
 export class UserController {

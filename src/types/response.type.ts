@@ -1,4 +1,4 @@
 export type ResponseType = {
-    status: string;
-    response: any;
+    status: String;
+    response: Object;
 }
