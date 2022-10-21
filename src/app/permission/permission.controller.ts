@@ -6,7 +6,7 @@ import { PermissionEntity } from './entities/permission.entity';
 import { GetPermission } from './types/getpermisison.type';
 
 @Controller('/permission')
-export class PermisisonController {
+export class PermissionController {
     private readonly _databaseProvider: DatabaseProvider;
 
     constructor(databseProvider: DatabaseProvider) {

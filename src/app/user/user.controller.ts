@@ -9,15 +9,18 @@ import { UserEntity } from './entities/user.entity';
 import { GetUser } from './types/getuser.type';
 import { GetStaff } from './types/getstaff.type';
 import { GetProfile } from './types/getprofile.type';
+import { RCONProvider } from '../rcon/rcon.provider';
 
 @Controller('/users')
 export class UserController {
     private readonly _configProvider: ConfigProvider;
     private readonly _databaseProvider: DatabaseProvider;
+    private readonly _rconProvider: RCONProvider;
 
-    constructor(configProvider: ConfigProvider, databseProvider: DatabaseProvider) {
+    constructor(configProvider: ConfigProvider, databseProvider: DatabaseProvider, rconProvider: RCONProvider) {
         this._configProvider = configProvider;
         this._databaseProvider = databseProvider;
+        this._rconProvider = rconProvider;
     }
 
     @Post('/get')

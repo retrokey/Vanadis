@@ -1,21 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '../config/config.module';
 import { DatabaseModule } from '../database/database.module';
-import { PermisisonController } from './permission.controller';
+import { PermissionController } from './permission.controller';
 
 @Module({
     imports: [
-        ConfigModule,
         DatabaseModule
     ],
     providers: [
 
     ],
     controllers: [
-        PermisisonController
+        PermissionController
     ],
     exports: [
 
     ]
 })
-export class PermisisonModule { }
+export class PermissionModule { }

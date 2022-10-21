@@ -1,0 +1,8 @@
+this._rconProvider.send({
+    key: 'hotelalert',
+    data: {
+        message: ''
+    }
+});
+
+(ARCTURUS MORNINGSTAR)
