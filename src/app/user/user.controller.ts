@@ -18,10 +18,10 @@ export class UserController {
     private readonly _databaseProvider: DatabaseProvider;
     private readonly _rconProvider: RCONProvider;
 
-    constructor(configProvider: ConfigProvider, databseProvider: DatabaseProvider) {
+    constructor(configProvider: ConfigProvider, databseProvider: DatabaseProvider, rconProvider: RCONProvider) {
         this._configProvider = configProvider;
         this._databaseProvider = databseProvider;
-        //this._rconProvider = rconProvider;
+        this._rconProvider = rconProvider;
     }
 
     @Post('/get')
@@ -31,7 +31,7 @@ export class UserController {
 
         if (body == undefined) {
             res.statusCode = 400;
-            res.send(ResponseUtils.sendMessage('error:Controlla di aver inserito l\'username e la password!'));
+            res.send(ResponseUtils.sendMessage('error:Check fields'));
             return;
         }
 
@@ -56,21 +56,18 @@ export class UserController {
 
         if (user == null) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:L\'utente ' + body.username + ' non esiste!'));
+            res.send(ResponseUtils.sendMessage('error:The user ' + body.username + ' was not found!'));
             return;
         }
 
         if (!bcrypt.compareSync(body.password, user.password)) {
             res.statusCode = 422;
-            res.send(ResponseUtils.sendMessage('error:La password inserita non è corretta!'));
+            res.send(ResponseUtils.sendMessage('error:The inserted password was incorrect!'));
             return;
         }
 
-        await this._databaseProvider.connection.getRepository(UserEntity).update(body.username, {
-            status: '1'
-        });
         const result: GetUser = {
-            'message': 'Benvenuto su ' + this._configProvider.config.vanadis.hotel_name + '!',
+            'message': 'Welcome on ' + this._configProvider.config.vanadis.hotel_name + '!',
             'sso': user.SSO,
             'user': sendUser
         };
@@ -103,7 +100,7 @@ export class UserController {
 
         if (user.length == 0) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:Non ci sono staff per questo rank!'));
+            res.send(ResponseUtils.sendMessage('error:There no staff for rank ' + parseInt(req.headers['requested-rank']) + '!'));
             return;
         }
 
@@ -137,13 +134,14 @@ export class UserController {
                 'avatar',
                 'mission',
                 'role',
-                'status'
+                'status',
+                'accountCreation'
             ]
         });
 
         if (user === null) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:Non ci sono staff per questo rank!'));
+            res.send(ResponseUtils.sendMessage('error:The user ' + req.headers['requested-user'] + ' was not found!'));
             return;
         }
 
