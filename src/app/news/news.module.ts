@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../core/database/database.module';
-import { PermissionController } from './permission.controller';
+import { NewsController } from './news.controller';
 
 @Module({
     imports: [
         DatabaseModule
     ],
     controllers: [
-        
+        NewsController
     ]
 })
-export class PermissionModule { }
+export class NewsModule { }

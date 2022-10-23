@@ -1,3 +1,4 @@
+import { GetNews } from '../app/news/types/getnews.type';
 import { GetPermission } from '../app/permission/types/getpermisison.type';
 import { GetProfile } from '../app/user/types/getprofile.type';
 import { GetStaff } from '../app/user/types/getstaff.type';
@@ -16,6 +17,26 @@ export class ResponseUtils {
             status: pretty.status,
             data: pretty.response
         }, null, 3);
+    }
+
+    public static sendNews(json: GetNews) {
+        let pretty: ResponseType = null;
+        if (json.news == null) {
+            pretty = {
+                status: 'success',
+                response: json.archive
+            };
+        } else {
+            pretty = {
+                status: 'success',
+                response: json.news
+            };
+        }
+
+        return JSON.stringify({
+            status: pretty.status,
+            data: pretty.response
+        }, null, 3);  
     }
 
     public static sendPermission(json: GetPermission) {

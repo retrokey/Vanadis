@@ -5,7 +5,7 @@ export class PermissionEntity {
     @PrimaryGeneratedColumn({
         name: 'id'
     })
-    public permissionId: number;
+    public id: number;
 
     @Column({
         name: 'permission'

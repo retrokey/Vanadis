@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { Controller, Res, Header, Get, Param } from '@nestjs/common';
+import { Controller, Res, Get, Param } from '@nestjs/common';
 import { DatabaseProvider } from '../../core/database/database.provider';
 import { ResponseUtils } from '../../utils/response.utils';
 import { PermissionEntity } from './entities/permission.entity';
@@ -34,7 +34,7 @@ export class PermissionController {
 
         if (permissionData == null) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:Il permesso non è stato trovato!'));
+            res.send(ResponseUtils.sendMessage('error:The permission ' + permission + ' was didn\'t find!'));
             return;
         }
 

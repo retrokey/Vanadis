@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { Controller, Body, Req, Res, Header, Post, Get } from '@nestjs/common';
 import { ConfigProvider } from '../../core/config/config.provider';
 import { DatabaseProvider } from '../../core/database/database.provider';
@@ -79,14 +79,14 @@ export class UserController {
     public async getStaff(@Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
 
-        if (req.headers['requested-rank'] == undefined) {
+        if (req.header['requested-rank'] == undefined) {
             res.statusCode = 400;
             return;
         }
 
         const user: Array<UserEntity> = await this._databaseProvider.connection.getRepository(UserEntity).find({
             where: {
-                rank: parseInt(req.headers['requested-rank'])
+                rank: parseInt(req.header['requested-rank'])
             },
             select: [
                 'nickname',
@@ -100,7 +100,7 @@ export class UserController {
 
         if (user.length == 0) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:There no staff for rank ' + parseInt(req.headers['requested-rank']) + '!'));
+            res.send(ResponseUtils.sendMessage('error:There doesn\'t have staff for rank ' + parseInt(req.header['requested-rank']) + '!'));
             return;
         }
 
@@ -115,14 +115,14 @@ export class UserController {
     public async getProfile(@Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
 
-        if (req.headers['requested-user'] == undefined) {
+        if (req.header['requested-user'] == undefined) {
             res.statusCode = 400;
             return;
         }
 
         const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
-                nickname: req.headers['requested-user']
+                nickname: req.header['requested-user']
             },
             relations: [
                 'currency'
@@ -141,7 +141,7 @@ export class UserController {
 
         if (user === null) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:The user ' + req.headers['requested-user'] + ' was not found!'));
+            res.send(ResponseUtils.sendMessage('error:The user ' + req.headers['requested-user'] + ' was didn\'t found!'));
             return;
         }
 
