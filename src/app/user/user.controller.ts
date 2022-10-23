@@ -24,8 +24,10 @@ export class UserController {
     }
 
     @Post('/get')
-    @Header('content-type', 'application/json')
     public async getUser(@Body() body: UserLoginDto, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
         if (body == null) {
             res.statusCode = 400;
             res.send(ResponseUtils.sendMessage('error:Controlla di aver inserito l\'username e la password!'));
@@ -80,8 +82,9 @@ export class UserController {
     }
 
     @Get('/get/rank')
-    @Header('content-type', 'application/json')
     public async getStaff(@Req() req: Request, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+
         if (req.headers['requested-rank'] == undefined) {
             res.statusCode = 400;
             return;
@@ -115,8 +118,9 @@ export class UserController {
     }
 
     @Get('/get/profile')
-    @Header('content-type', 'application/json')
     public async getProfile(@Req() req: Request, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+
         if (req.headers['requested-user'] == undefined) {
             res.statusCode = 400;
             return;
