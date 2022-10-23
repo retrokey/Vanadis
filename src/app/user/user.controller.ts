@@ -29,7 +29,7 @@ export class UserController {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
-        if (body == null) {
+        if (body == undefined) {
             res.statusCode = 400;
             res.send(ResponseUtils.sendMessage('error:Controlla di aver inserito l\'username e la password!'));
             return;
@@ -118,14 +118,14 @@ export class UserController {
     public async getProfile(@Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
 
-        /*if (req.headers['requested-user'] == undefined) {
+        if (req.headers['requested-user'] == undefined) {
             res.statusCode = 400;
             return;
-        }*/
+        }
 
         const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
-                nickname: 'RealCosis'//req.headers['requested-user']
+                nickname: req.headers['requested-user']
             },
             relations: [
                 'currency'
@@ -136,7 +136,6 @@ export class UserController {
                 'credits',
                 'avatar',
                 'mission',
-                'accountCreation',
                 'role',
                 'status'
             ]
