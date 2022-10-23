@@ -21,7 +21,7 @@ export class UserCurrencyEntity {
     @ManyToOne(() => UserEntity, user => user.currency)
     @JoinColumn({
         name: 'user_id',
-        referencedColumnName: 'accountId'
+        referencedColumnName: 'id'
     })
     public user: UserEntity;
 }

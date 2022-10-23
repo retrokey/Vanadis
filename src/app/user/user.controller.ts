@@ -10,6 +10,7 @@ import { UserEntity } from './entities/user.entity';
 import { GetUser } from './types/getuser.type';
 import { GetStaff } from './types/getstaff.type';
 import { GetProfile } from './types/getprofile.type';
+import { FriendsEntity } from './entities/friends.entity';
 
 @Controller('/users')
 export class UserController {
@@ -17,10 +18,10 @@ export class UserController {
     private readonly _databaseProvider: DatabaseProvider;
     private readonly _rconProvider: RCONProvider;
 
-    constructor(configProvider: ConfigProvider, databseProvider: DatabaseProvider, rconProvider: RCONProvider) {
+    constructor(configProvider: ConfigProvider, databseProvider: DatabaseProvider) {
         this._configProvider = configProvider;
         this._databaseProvider = databseProvider;
-        this._rconProvider = rconProvider;
+        //this._rconProvider = rconProvider;
     }
 
     @Post('/get')
@@ -43,17 +44,13 @@ export class UserController {
             where: {
                 nickname: body.username
             },
-            relations: [
-                'currency'
-            ],
             select: [
-                'accountId',
                 'nickname',
                 'avatar',
                 'mission',
                 'role',
-                'rank',
-                'status'
+                'status',
+                'rank'
             ]
         });
 
@@ -95,12 +92,12 @@ export class UserController {
                 rank: parseInt(req.headers['requested-rank'])
             },
             select: [
-                'accountId',
                 'nickname',
                 'avatar',
                 'mission',
                 'role',
-                'status'
+                'status',
+                'rank'
             ]
         });
 
@@ -121,20 +118,20 @@ export class UserController {
     public async getProfile(@Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
 
-        if (req.headers['requested-user'] == undefined) {
+        /*if (req.headers['requested-user'] == undefined) {
             res.statusCode = 400;
             return;
-        }
+        }*/
 
         const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
-                nickname: req.headers['requested-user']
+                nickname: 'RealCosis'//req.headers['requested-user']
             },
             relations: [
                 'currency'
             ],
             select: [
-                'accountId',
+                'id',
                 'nickname',
                 'credits',
                 'avatar',
@@ -151,6 +148,25 @@ export class UserController {
             return;
         }
 
+        const friends: Array<FriendsEntity> = await this._databaseProvider.connection.getRepository(FriendsEntity).find({
+            where: {
+                user_one_id: user.id
+            }
+        });
+        const friendsArray: Array<UserEntity> = new Array<UserEntity>();
+        for (let friend of friends) {
+            const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+                where: {
+                    id: friend.user_two_id
+                },
+                select: [
+                    'nickname',
+                    'avatar'
+                ]
+            });
+            friendsArray.push(user);
+        }
+
         let options: any = {
             year: 'numeric',
             month: '2-digit',
@@ -159,7 +175,8 @@ export class UserController {
         let date: string = new Date(user.accountCreation * 1000).toLocaleDateString('it-IT', options);
         const result: GetProfile = {
             registration: date,
-            user: user
+            user: user,
+            friends: friendsArray
         };
         res.statusCode = 200;
         res.send(ResponseUtils.sendProfile(result));

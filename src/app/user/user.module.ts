@@ -7,8 +7,8 @@ import { UserController } from './user.controller';
 @Module({
     imports: [
         ConfigModule,
-        RCONModule,
-        DatabaseModule
+        DatabaseModule,
+        RCONModule
     ],
     providers: [
 

@@ -1,13 +1,13 @@
-import { Entity, Index, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm';
+import { FriendsEntity } from './friends.entity';
 import { UserCurrencyEntity } from './users_currency.entity';
 
 @Entity('users')
 export class UserEntity {
-    @Index()
     @PrimaryGeneratedColumn({
         name: 'id'
     })
-    public accountId: number;
+    public id: number;
 
     @Column({
         name: 'username'
@@ -65,4 +65,11 @@ export class UserEntity {
         referencedColumnName: 'user_id'
     })
     public currency: UserCurrencyEntity[];
+
+    @OneToMany(() => FriendsEntity, friends => friends.user)
+    @JoinColumn({
+        name: 'accountId',
+        referencedColumnName: 'user_one_id'
+    })
+    public friends: FriendsEntity[];
 }

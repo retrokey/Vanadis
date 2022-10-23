@@ -4,6 +4,7 @@ import { ConfigProvider } from '../config/config.provider';
 import { PermissionEntity } from '../../app/permission/entities/permission.entity';
 import { UserEntity } from '../../app/user/entities/user.entity';
 import { UserCurrencyEntity } from '../../app/user/entities/users_currency.entity';
+import { FriendsEntity } from '../../app/user/entities/friends.entity';
 
 @Injectable()
 export class DatabaseProvider {
@@ -32,6 +33,7 @@ export class DatabaseProvider {
             entities: [
                 UserEntity,
                 UserCurrencyEntity,
+                FriendsEntity,
                 PermissionEntity
             ]
         }).initialize();
