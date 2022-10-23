@@ -1,5 +1,4 @@
 package-lock.json
-src/resources/configuration.json
 dist/
 src/resources/SSL/
 node_modules/
