@@ -7,7 +7,7 @@ import { PermissionController } from './permission.controller';
         DatabaseModule
     ],
     controllers: [
-        
+        PermissionController
     ]
 })
 export class PermissionModule { }
