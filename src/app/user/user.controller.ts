@@ -1,11 +1,11 @@
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { Controller, Body, Req, Res, Header, Post, Get, Param } from '@nestjs/common';
+import { Controller, Body, Req, Res, Header, Post, Get, Param, Put } from '@nestjs/common';
 import { ConfigProvider } from '../../core/config/config.provider';
 import { DatabaseProvider } from '../../core/database/database.provider';
 import { RCONProvider } from '../../core/rcon/rcon.provider';
 import { ResponseUtils } from '../../utils/response.utils';
-import { UserLoginDto } from './user.dto';
+import { UserLoginDto, UserUpdateRankDto } from './user.dto';
 import { UserEntity } from './entities/user.entity';
 import { GetUser } from './types/getuser.type';
 import { GetStaff } from './types/getstaff.type';
@@ -169,5 +169,35 @@ export class UserController {
         };
         res.statusCode = 200;
         res.send(ResponseUtils.sendProfile(result));
+    }
+
+    @Put('/update/rank')
+    public async updateRank(@Body() body: UserUpdateRankDto, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
+        const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+            where: {
+                nickname: body.username
+            }
+        });
+
+        if (user == null) {
+            res.statusCode = 404;
+            res.send(ResponseUtils.sendMessage('error:The user ' + body.username + ' was didn\'t found!'));
+            return;
+        }
+
+        await this._databaseProvider.connection.getRepository(UserEntity).update({id: user.id}, {
+            role: body.role,
+            rank: body.rank
+        });
+        this._rconProvider.send({
+            key: 'setrank',
+            data: {
+                user_id: user.id,
+                rank: body.rank
+            }
+        });
     }
 }
