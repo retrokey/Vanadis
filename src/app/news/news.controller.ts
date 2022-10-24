@@ -16,6 +16,7 @@ export class NewsController {
     @Get('/lists')
     public async getLists(@Query('page') page: number, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
 
         let newsList: Array<NewsEntity> = await this._databaseProvider.connection.getRepository(NewsEntity).find({
             take: 4,
@@ -38,6 +39,7 @@ export class NewsController {
     @Get('/:id')
     public async getNews(@Param('id') news: number, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
 
         let newsData: NewsEntity = await this._databaseProvider.connection.getRepository(NewsEntity).findOne({
             where: {

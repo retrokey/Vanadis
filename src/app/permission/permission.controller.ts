@@ -16,6 +16,7 @@ export class PermissionController {
     @Get('/get/:permission')
     public async getPermission(@Param('permission') permission: string, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
 
         if (permission.length == 0) {
             res.statusCode = 400;

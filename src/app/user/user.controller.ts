@@ -78,6 +78,7 @@ export class UserController {
     @Get('/rank/:rank')
     public async getStaff(@Param('rank') rankId: string, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
 
         const user: Array<UserEntity> = await this._databaseProvider.connection.getRepository(UserEntity).find({
             where: {
@@ -109,6 +110,7 @@ export class UserController {
     @Get('/profile/:username')
     public async getProfile(@Param('username') username: string,@Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
 
         const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
