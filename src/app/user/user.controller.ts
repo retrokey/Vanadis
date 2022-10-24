@@ -199,5 +199,7 @@ export class UserController {
                 rank: body.rank
             }
         });
+        res.statusCode = 200;
+        res.send(ResponseUtils.sendMessage('success:The user ' + body.username + ' was successfully updated!'));
     }
 }
