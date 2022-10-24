@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { Controller, Body, Req, Res, Header, Post, Get } from '@nestjs/common';
+import { Controller, Body, Req, Res, Header, Post, Get, Param } from '@nestjs/common';
 import { ConfigProvider } from '../../core/config/config.provider';
 import { DatabaseProvider } from '../../core/database/database.provider';
 import { RCONProvider } from '../../core/rcon/rcon.provider';
@@ -12,7 +12,7 @@ import { GetStaff } from './types/getstaff.type';
 import { GetProfile } from './types/getprofile.type';
 import { FriendsEntity } from './entities/friends.entity';
 
-@Controller('/users')
+@Controller('/user')
 export class UserController {
     private readonly _configProvider: ConfigProvider;
     private readonly _databaseProvider: DatabaseProvider;
@@ -24,7 +24,7 @@ export class UserController {
         this._rconProvider = rconProvider;
     }
 
-    @Post('/get')
+    @Post('/find')
     public async getUser(@Body() body: UserLoginDto, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
@@ -75,18 +75,13 @@ export class UserController {
         res.send(ResponseUtils.sendUser(result));
     }
 
-    @Get('/get/rank')
-    public async getStaff(@Req() req: Request, @Res() res: Response): Promise<void> {
+    @Get('/rank/:rank')
+    public async getStaff(@Param('rank') rankId: string, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
-
-        if (req.header['requested-rank'] == undefined) {
-            res.statusCode = 400;
-            return;
-        }
 
         const user: Array<UserEntity> = await this._databaseProvider.connection.getRepository(UserEntity).find({
             where: {
-                rank: parseInt(req.header['requested-rank'])
+                rank: parseInt(rankId)
             },
             select: [
                 'nickname',
@@ -100,7 +95,7 @@ export class UserController {
 
         if (user.length == 0) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:There doesn\'t have staff for rank ' + parseInt(req.header['requested-rank']) + '!'));
+            res.send(ResponseUtils.sendMessage('error:There doesn\'t have staff for rank ' + parseInt(rankId) + '!'));
             return;
         }
 
@@ -111,18 +106,13 @@ export class UserController {
         res.send(ResponseUtils.sendStaff(result));
     }
 
-    @Get('/get/profile')
-    public async getProfile(@Req() req: Request, @Res() res: Response): Promise<void> {
+    @Get('/profile/:username')
+    public async getProfile(@Param('username') username: string,@Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
-
-        if (req.header['requested-user'] == undefined) {
-            res.statusCode = 400;
-            return;
-        }
 
         const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
-                nickname: req.header['requested-user']
+                nickname: username
             },
             relations: [
                 'currency'
@@ -141,7 +131,7 @@ export class UserController {
 
         if (user === null) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:The user ' + req.headers['requested-user'] + ' was didn\'t found!'));
+            res.send(ResponseUtils.sendMessage('error:The user ' + username + ' was didn\'t found!'));
             return;
         }
 
