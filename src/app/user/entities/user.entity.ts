@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm';
 import { FriendsEntity } from './friends.entity';
+import { RoomsEntity } from './rooms.entity';
 import { UserCurrencyEntity } from './users_currency.entity';
 
 @Entity('users')
@@ -61,15 +62,22 @@ export class UserEntity {
 
     @OneToMany(() => UserCurrencyEntity, currency => currency.user)
     @JoinColumn({
-        name: 'accountId',
+        name: 'id',
         referencedColumnName: 'user_id'
     })
     public currency: UserCurrencyEntity[];
 
     @OneToMany(() => FriendsEntity, friends => friends.user)
     @JoinColumn({
-        name: 'accountId',
+        name: 'id',
         referencedColumnName: 'user_one_id'
     })
     public friends: FriendsEntity[];
+
+    @OneToMany(() => RoomsEntity, friends => friends.user)
+    @JoinColumn({
+        name: 'id',
+        referencedColumnName: 'owner_id'
+    })
+    public rooms: RoomsEntity[];
 }

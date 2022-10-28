@@ -11,6 +11,7 @@ import { GetUser } from './types/getuser.type';
 import { GetStaff } from './types/getstaff.type';
 import { GetProfile } from './types/getprofile.type';
 import { FriendsEntity } from './entities/friends.entity';
+import { RoomsEntity } from './entities/rooms.entity';
 
 @Controller('/user')
 export class UserController {
@@ -140,7 +141,8 @@ export class UserController {
         const friends: Array<FriendsEntity> = await this._databaseProvider.connection.getRepository(FriendsEntity).find({
             where: {
                 user_one_id: user.id
-            }
+            },
+            take: 4
         });
         const friendsArray: Array<UserEntity> = new Array<UserEntity>();
         for (let friend of friends) {
@@ -156,6 +158,17 @@ export class UserController {
             friendsArray.push(user);
         }
 
+        const rooms: Array<RoomsEntity> = await this._databaseProvider.connection.getRepository(RoomsEntity).find({
+            select: [
+                'roomName',
+                'usersCount'
+            ],
+            where: {
+                ownerId: user.id
+            },
+            take: 4
+        });
+ 
         let options: any = {
             year: 'numeric',
             month: '2-digit',
@@ -165,7 +178,8 @@ export class UserController {
         const result: GetProfile = {
             registration: date,
             user: user,
-            friends: friendsArray
+            friends: friendsArray,
+            rooms: rooms
         };
         res.statusCode = 200;
         res.send(ResponseUtils.sendProfile(result));
