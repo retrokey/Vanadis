@@ -160,15 +160,16 @@ export class UserController {
 
         const rooms: Array<RoomsEntity> = await this._databaseProvider.connection.getRepository(RoomsEntity).find({
             select: [
+                'id',
                 'roomName',
                 'usersCount'
             ],
             where: {
                 ownerId: user.id
             },
-            take: 4
+            take: 2
         });
- 
+
         let options: any = {
             year: 'numeric',
             month: '2-digit',
