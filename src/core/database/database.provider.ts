@@ -1,21 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { ConfigProvider } from '../config/config.provider';
-import { PermissionEntity } from '../../app/permission/entities/permission.entity';
-import { UserEntity } from '../../app/user/entities/user.entity';
-import { UserCurrencyEntity } from '../../app/user/entities/users_currency.entity';
-import { FriendsEntity } from '../../app/user/entities/friends.entity';
-import { NewsEntity } from '../../app/news/entity/news.entity';
-import { RoomsEntity } from '../../app/user/entities/rooms.entity';
+import { UserEntity } from './entities/user.entity';
+import { UserCurrencyEntity } from './entities/users_currency.entity';
+import { FriendsEntity } from './entities/friends.entity';
+import { RoomsEntity } from './entities/rooms.entity';
 
 @Injectable()
 export class DatabaseProvider {
     private readonly _configProvider: ConfigProvider;
     private _connection: DataSource;
 
-    constructor(
-        configProvider: ConfigProvider
-    ) {
+    constructor(configProvider: ConfigProvider) {
         this._configProvider = configProvider;
         this.make().then((connection: DataSource) => {
             this._connection = connection;
@@ -36,9 +32,7 @@ export class DatabaseProvider {
                 UserEntity,
                 UserCurrencyEntity,
                 FriendsEntity,
-                RoomsEntity,
-                NewsEntity,
-                PermissionEntity
+                RoomsEntity
             ]
         }).initialize();
     }

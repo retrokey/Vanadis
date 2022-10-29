@@ -1,38 +1,33 @@
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { Controller, Body, Req, Res, Header, Post, Get, Param, Put } from '@nestjs/common';
-import { ConfigProvider } from '../../core/config/config.provider';
+import { Controller, Body, Req, Res, Post, Get, Param, Logger } from '@nestjs/common';
 import { DatabaseProvider } from '../../core/database/database.provider';
-import { RCONProvider } from '../../core/rcon/rcon.provider';
 import { ResponseUtils } from '../../utils/response.utils';
-import { UserLoginDto, UserUpdateRankDto } from './user.dto';
-import { UserEntity } from './entities/user.entity';
-import { GetUser } from './types/getuser.type';
-import { GetStaff } from './types/getstaff.type';
-import { GetProfile } from './types/getprofile.type';
-import { FriendsEntity } from './entities/friends.entity';
-import { RoomsEntity } from './entities/rooms.entity';
+import { UserLoginDto } from './user.dto';
+import { UserEntity } from '../../core/database/entities/user.entity';
+import { FriendsEntity } from '../../core/database/entities/friends.entity';
+import { RoomsEntity } from '../../core/database/entities/rooms.entity';
+import { UserType } from '../../types/user.type';
+import { StaffType } from '../../types/staff.type';
+import { ProfileType } from '../../types/profile.type';
 
 @Controller('/user')
 export class UserController {
-    private readonly _configProvider: ConfigProvider;
     private readonly _databaseProvider: DatabaseProvider;
-    private readonly _rconProvider: RCONProvider;
 
-    constructor(configProvider: ConfigProvider, databseProvider: DatabaseProvider, rconProvider: RCONProvider) {
-        this._configProvider = configProvider;
+    constructor(databseProvider: DatabaseProvider) {
         this._databaseProvider = databseProvider;
-        this._rconProvider = rconProvider;
     }
 
     @Post('/find')
-    public async getUser(@Body() body: UserLoginDto, @Res() res: Response): Promise<void> {
+    public async getUser(@Body() body: UserLoginDto, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
-        if (body == undefined) {
+        if (body.username.length == 0 || body.password.length == 0) {
             res.statusCode = 400;
-            res.send(ResponseUtils.sendMessage('error:Check fields'));
+            res.statusMessage = '400 - Check login fields';
+            res.send(ResponseUtils.message(req, res, 'error:Check username or password fields!'));
             return;
         }
 
@@ -41,43 +36,37 @@ export class UserController {
                 nickname: body.username
             }
         });
-        const sendUser: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
-            where: {
-                nickname: body.username
-            },
-            select: [
-                'nickname',
-                'avatar',
-                'mission',
-                'role',
-                'status',
-                'rank'
-            ]
-        });
-
         if (user == null) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:The user ' + body.username + ' was not found!'));
+            res.statusMessage = '404 - The requested user wasn\'t found!';
+            res.send(ResponseUtils.message(req, res, 'error:The user ' + body.username + ' wasn\'t found!'));
             return;
         }
-
-        if (!bcrypt.compareSync(body.password, user.password)) {
+        const password: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+            select: [
+                'password'
+            ],
+            where: {
+                id: user.id
+            }
+        });
+        if (!bcrypt.compareSync(body.password, password.password)) {
             res.statusCode = 422;
-            res.send(ResponseUtils.sendMessage('error:The inserted password was incorrect!'));
+            res.statusMessage = '422 - The password was incorrect';
+            res.send(ResponseUtils.message(req, res, 'error:The inserted password was incorrect!'));
             return;
         }
 
-        const result: GetUser = {
-            'message': 'Welcome on ' + this._configProvider.config.vanadis.hotel_name + '!',
-            'sso': user.SSO,
-            'user': sendUser
+        const result: UserType = {
+            user: user
         };
         res.statusCode = 200;
-        res.send(ResponseUtils.sendUser(result));
+        res.statusMessage = '200 - Login OK';
+        res.send(ResponseUtils.user(req, res, result));
     }
 
     @Get('/rank/:rank')
-    public async getStaff(@Param('rank') rankId: string, @Res() res: Response): Promise<void> {
+    public async getStaff(@Param('rank') rankId: string, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
@@ -97,19 +86,19 @@ export class UserController {
 
         if (user.length == 0) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:There doesn\'t have staff for rank ' + parseInt(rankId) + '!'));
+            res.send(ResponseUtils.message(req, res, 'error:There doesn\'t have staff for rank ' + parseInt(rankId) + '!'));
             return;
         }
 
-        const result: GetStaff = {
+        const result: StaffType = {
             staffer: user
         };
         res.statusCode = 200;
-        res.send(ResponseUtils.sendStaff(result));
+        res.send(ResponseUtils.staff(req, res, result));
     }
 
     @Get('/profile/:username')
-    public async getProfile(@Param('username') username: string,@Res() res: Response): Promise<void> {
+    public async getProfile(@Param('username') username: string, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
@@ -119,22 +108,12 @@ export class UserController {
             },
             relations: [
                 'currency'
-            ],
-            select: [
-                'id',
-                'nickname',
-                'credits',
-                'avatar',
-                'mission',
-                'role',
-                'status',
-                'accountCreation'
             ]
         });
 
         if (user === null) {
             res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:The user ' + username + ' was didn\'t found!'));
+            res.send(ResponseUtils.message(req, res, 'error:The user ' + username + ' was didn\'t found!'));
             return;
         }
 
@@ -176,45 +155,13 @@ export class UserController {
             day: '2-digit'
         };
         let date: string = new Date(user.accountCreation * 1000).toLocaleDateString('it-IT', options);
-        const result: GetProfile = {
+        const result: ProfileType = {
             registration: date,
             user: user,
             friends: friendsArray,
             rooms: rooms
         };
         res.statusCode = 200;
-        res.send(ResponseUtils.sendProfile(result));
-    }
-
-    @Put('/update/rank')
-    public async updateRank(@Body() body: UserUpdateRankDto, @Res() res: Response): Promise<void> {
-        res.header('content-type', 'application/json');
-        res.header('access-control-allow-origin', '*');
-
-        const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
-            where: {
-                nickname: body.username
-            }
-        });
-
-        if (user == null) {
-            res.statusCode = 404;
-            res.send(ResponseUtils.sendMessage('error:The user ' + body.username + ' was didn\'t found!'));
-            return;
-        }
-
-        await this._databaseProvider.connection.getRepository(UserEntity).update({id: user.id}, {
-            role: body.role,
-            rank: body.rank
-        });
-        this._rconProvider.send({
-            key: 'setrank',
-            data: {
-                user_id: user.id,
-                rank: body.rank
-            }
-        });
-        res.statusCode = 200;
-        res.send(ResponseUtils.sendMessage('success:The user ' + body.username + ' was successfully updated!'));
+        res.send(ResponseUtils.profile(req, res, result));
     }
 }

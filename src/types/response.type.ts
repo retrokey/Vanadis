@@ -1,4 +1,4 @@
 export type ResponseType = {
     status: String;
-    response: Object;
+    data: Object;
 }

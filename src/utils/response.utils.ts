@@ -1,89 +1,55 @@
-import { GetNews } from '../app/news/types/getnews.type';
-import { GetPermission } from '../app/permission/types/getpermisison.type';
-import { GetProfile } from '../app/user/types/getprofile.type';
-import { GetStaff } from '../app/user/types/getstaff.type';
-import { GetUser } from '../app/user/types/getuser.type';
+import { Request, Response } from 'express';
+import { Logger, Req, Res } from '@nestjs/common';
+import { ProfileType } from '../types/profile.type';
 import { ResponseType } from '../types/response.type';
+import { StaffType } from '../types/staff.type';
+import { UserType } from '../types/user.type';
+import { ConfigProvider } from '../core/config/config.provider';
 
 export class ResponseUtils {
-    public static sendMessage(value: string) {
-        let split: Array<string> = value.toString().split(':');
-        let pretty: ResponseType = {
-            status: split[0],
-            response: split[1]
-        };
+    private static readonly _configProvider: ConfigProvider = new ConfigProvider();
 
+    private static send(@Req() req: Request, @Res() res: Response, data: ResponseType): string {
+        if (this._configProvider.config.vanadis.debug) {
+            const logger: Logger = new Logger('ResponseManager');
+            logger.debug('REQUESTED: ' + req.url + ' || FROM: ' + req.ip + ' || RESPONSE STATUS: ' + data.status);
+        }
         return JSON.stringify({
-            status: pretty.status,
-            data: pretty.response
+            status: data.status,
+            data: data.data
         }, null, 3);
     }
 
-    public static sendNews(json: GetNews) {
-        let pretty: ResponseType = null;
-        if (json.news == null) {
-            pretty = {
-                status: 'success',
-                response: json.archive
-            };
-        } else {
-            pretty = {
-                status: 'success',
-                response: json.news
-            };
+    public static message(@Req() req: Request, @Res() res: Response, message: string): string {
+        let split: Array<string> = message.split(':');
+        let send: ResponseType = {
+            status: split[0],
+            data: split[1]
         }
-
-        return JSON.stringify({
-            status: pretty.status,
-            data: pretty.response
-        }, null, 3);  
+        return this.send(req, res, send);
     }
 
-    public static sendPermission(json: GetPermission) {
-        let pretty: ResponseType = {
+    public static user(@Req() req: Request, @Res() res: Response, object: UserType): string {
+        let send: ResponseType = {
             status: 'success',
-            response: json
-        };
-
-        return JSON.stringify({
-            status: pretty.status,
-            data: pretty.response
-        }, null, 3);  
+            data: object
+        }
+        return this.send(req, res, send);
     }
 
-    public static sendProfile(json: GetProfile) {
-        let pretty: ResponseType = {
+    public static staff(@Req() req: Request, @Res() res: Response, object: StaffType): string {
+        let send: ResponseType = {
             status: 'success',
-            response: json
-        };
-
-        return JSON.stringify({
-            status: pretty.status,
-            data: pretty.response
-        }, null, 3);  
+            data: object
+        }
+        return this.send(req, res, send);
     }
 
-    public static sendUser(json: GetUser) {
-        let pretty: ResponseType = {
+    public static profile(@Req() req: Request, @Res() res: Response, object: ProfileType): string {
+        let send: ResponseType = {
             status: 'success',
-            response: json
-        };
-
-        return JSON.stringify({
-            status: pretty.status,
-            data: pretty.response
-        }, null, 3);  
-    }
-
-    public static sendStaff(json: GetStaff) {
-        let pretty: ResponseType = {
-            status: 'success',
-            response: json
-        };
-
-        return JSON.stringify({
-            status: pretty.status,
-            data: pretty.response
-        }, null, 3);  
+            data: object
+        }
+        return this.send(req, res, send);
     }
 }

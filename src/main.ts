@@ -19,10 +19,9 @@ async function bootstrap(): Promise<void> {
     }
     let vanadis: INestApplication = await NestFactory.create(VanadisModule, options);
 
-    const logger: Logger = new Logger('VanadisIntroducer');
+    const logger: Logger = new Logger('Vanadis');
     const configProvider: ConfigProvider = vanadis.get(ConfigProvider);
-    logger.log('Vanadis - NestJS Engine');
-    logger.log('Vanadis - v1.0.0 - By RealCosis');
+    logger.log('Vanadis - NestJS Engine - By RealCosis');
     if (configProvider.config.vanadis.debug) {
         logger.debug('Vanadis - Debug System: Enabled');
     }

@@ -16,7 +16,8 @@ export class UserEntity {
     public nickname: string;
 
     @Column({
-        name: 'password'
+        name: 'password',
+        select: false
     })
     public password: string;
 
