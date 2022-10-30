@@ -3,13 +3,14 @@ import { Request, Response } from 'express';
 import { Controller, Body, Req, Res, Post, Get, Param, Logger } from '@nestjs/common';
 import { DatabaseProvider } from '../../core/database/database.provider';
 import { ResponseUtils } from '../../utils/response.utils';
-import { UserLoginDto } from './user.dto';
+import { UserLoginDto, UserRegistrationDto } from './user.dto';
 import { UserEntity } from '../../core/database/entities/user.entity';
 import { FriendsEntity } from '../../core/database/entities/friends.entity';
 import { RoomsEntity } from '../../core/database/entities/rooms.entity';
 import { UserType } from '../../types/user.type';
 import { StaffType } from '../../types/staff.type';
 import { ProfileType } from '../../types/profile.type';
+import { InsertResult } from 'typeorm';
 
 @Controller('/user')
 export class UserController {
@@ -62,6 +63,67 @@ export class UserController {
         };
         res.statusCode = 200;
         res.statusMessage = '200 - Login OK';
+        res.send(ResponseUtils.user(req, res, result));
+    }
+
+    @Post('/new')
+    public async newUser(@Body() body: UserRegistrationDto, @Req() req: Request, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
+        if (body.username.length == 0 || body.password.length == 0) {
+            res.statusCode = 400;
+            res.statusMessage = '400 - Check registration fields';
+            res.send(ResponseUtils.message(req, res, 'error:Check the registration fields!'));
+            return;
+        }
+
+        const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+            where: {
+                nickname: body.username
+            }
+        });
+        if (user != null) {
+            res.statusCode = 409;
+            res.statusMessage = '409 - User already exists';
+            res.send(ResponseUtils.message(req, res, 'error:An user with username ' + user.nickname + ' already exists!'));
+            return;
+        }
+
+        const mail: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+            where: {
+                mail: body.mail
+            }
+        });
+        if (mail != null) {
+            res.statusCode = 409;
+            res.statusMessage = '409 - User already exists';
+            res.send(ResponseUtils.message(req, res, 'error:An user with email ' + mail.mail + ' already exists!'));
+            return;
+        }
+
+        const passwordCrypt: string = bcrypt.hashSync(body.password, bcrypt.genSaltSync(10));
+        await this._databaseProvider.connection.getRepository(UserEntity).insert({
+            nickname: body.username,
+            password: passwordCrypt,
+            mail: body.mail,
+            accountCreation: Math.floor(Date.now() / 1000),
+            rank: 1,
+            mission: 'Welcome',
+            SSO: (Math.random() + 1).toString(36).substring(2),
+            registerIp: req.ip,
+            currentIp: req.ip
+        });
+        const inserted: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+            where: {
+                nickname: body.username
+            }
+        });
+        const result: UserType = {
+            user: inserted
+        };
+        res.statusCode = 200;
+        res.statusMessage = '200 - Registration OK';
         res.send(ResponseUtils.user(req, res, result));
     }
 

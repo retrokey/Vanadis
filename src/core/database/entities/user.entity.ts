@@ -16,10 +16,27 @@ export class UserEntity {
     public nickname: string;
 
     @Column({
+        name: 'mail'
+    })
+    public mail: string;
+
+    @Column({
         name: 'password',
         select: false
     })
     public password: string;
+
+    @Column({
+        name: 'ip_register',
+        select: false
+    })
+    public registerIp: string;
+
+    @Column({
+        name: 'ip_current',
+        select: false
+    })
+    public currentIp: string;
 
     @Column({
         name: 'role'
