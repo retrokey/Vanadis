@@ -1,7 +1,7 @@
 {
     "vanadis": {
-        "hotel_name": "Mythical",
-        "debug": true
+        "name": "Mythical",
+        "debug": false
     },
     "database": {
         "host": "127.0.0.1",
