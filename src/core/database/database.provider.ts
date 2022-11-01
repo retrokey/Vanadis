@@ -5,6 +5,7 @@ import { UserEntity } from './entities/user.entity';
 import { UserCurrencyEntity } from './entities/users_currency.entity';
 import { FriendsEntity } from './entities/friends.entity';
 import { RoomsEntity } from './entities/rooms.entity';
+import { NewsEntity } from './entities/news.entity';
 
 @Injectable()
 export class DatabaseProvider {
@@ -32,7 +33,8 @@ export class DatabaseProvider {
                 UserEntity,
                 UserCurrencyEntity,
                 FriendsEntity,
-                RoomsEntity
+                RoomsEntity,
+                NewsEntity
             ]
         }).initialize();
     }

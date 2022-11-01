@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from './user.entity';
 
 @Entity('rooms')

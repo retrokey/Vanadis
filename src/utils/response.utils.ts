@@ -5,6 +5,7 @@ import { ResponseType } from '../types/response.type';
 import { StaffType } from '../types/staff.type';
 import { UserType } from '../types/user.type';
 import { ConfigProvider } from '../core/config/config.provider';
+import { NewsType } from '../types/news.type';
 
 export class ResponseUtils {
     private static readonly _configProvider: ConfigProvider = new ConfigProvider();
@@ -46,6 +47,14 @@ export class ResponseUtils {
     }
 
     public static profile(@Req() req: Request, @Res() res: Response, object: ProfileType): string {
+        let send: ResponseType = {
+            status: 'success',
+            data: object
+        }
+        return this.send(req, res, send);
+    }
+
+    public static news(@Req() req: Request, @Res() res: Response, object: NewsType): string {
         let send: ResponseType = {
             status: 'success',
             data: object

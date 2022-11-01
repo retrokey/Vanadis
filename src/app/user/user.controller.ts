@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { Controller, Body, Req, Res, Post, Get, Param, Logger } from '@nestjs/common';
+import { Controller, Body, Req, Res, Post, Get, Param } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { DatabaseProvider } from '../../core/database/database.provider';
 import { ResponseUtils } from '../../utils/response.utils';
 import { UserLoginDto, UserRegistrationDto } from './user.dto';
@@ -10,7 +11,6 @@ import { RoomsEntity } from '../../core/database/entities/rooms.entity';
 import { UserType } from '../../types/user.type';
 import { StaffType } from '../../types/staff.type';
 import { ProfileType } from '../../types/profile.type';
-import { JwtService } from '@nestjs/jwt';
 
 @Controller('/user')
 export class UserController {
@@ -34,7 +34,7 @@ export class UserController {
             return;
         }
 
-        const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+        const user: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
             where: {
                 nickname: body.username
             }
@@ -45,7 +45,7 @@ export class UserController {
             res.send(ResponseUtils.message(req, res, 'error:The user ' + body.username + ' wasn\'t found!'));
             return;
         }
-        const password: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+        const password: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
             select: [
                 'password'
             ],
@@ -100,7 +100,7 @@ export class UserController {
             return;
         }
 
-        const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+        const user: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
             where: {
                 nickname: body.username
             }
@@ -112,7 +112,7 @@ export class UserController {
             return;
         }
 
-        const mail: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+        const mail: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
             where: {
                 mail: body.mail
             }
@@ -155,7 +155,7 @@ export class UserController {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
-        const user: Array<UserEntity> = await this._databaseProvider.connection.getRepository(UserEntity).find({
+        const user: Array<UserEntity> = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).find({
             where: {
                 rank: parseInt(rankId)
             },
@@ -187,7 +187,7 @@ export class UserController {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
-        const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+        const user: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
             where: {
                 nickname: username
             },
@@ -202,7 +202,7 @@ export class UserController {
             return;
         }
 
-        const friends: Array<FriendsEntity> = await this._databaseProvider.connection.getRepository(FriendsEntity).find({
+        const friends: Array<FriendsEntity> = await this._databaseProvider.connection.getRepository<FriendsEntity>(FriendsEntity).find({
             where: {
                 user_one_id: user.id
             },
@@ -210,7 +210,7 @@ export class UserController {
         });
         const friendsArray: Array<UserEntity> = new Array<UserEntity>();
         for (let friend of friends) {
-            const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+            const user: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
                 where: {
                     id: friend.user_two_id
                 },
@@ -222,7 +222,7 @@ export class UserController {
             friendsArray.push(user);
         }
 
-        const rooms: Array<RoomsEntity> = await this._databaseProvider.connection.getRepository(RoomsEntity).find({
+        const rooms: Array<RoomsEntity> = await this._databaseProvider.connection.getRepository<RoomsEntity>(RoomsEntity).find({
             select: [
                 'id',
                 'roomName',
