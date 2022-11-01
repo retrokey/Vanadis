@@ -10,14 +10,16 @@ import { RoomsEntity } from '../../core/database/entities/rooms.entity';
 import { UserType } from '../../types/user.type';
 import { StaffType } from '../../types/staff.type';
 import { ProfileType } from '../../types/profile.type';
-import { InsertResult } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('/user')
 export class UserController {
     private readonly _databaseProvider: DatabaseProvider;
+    private readonly _jwtService: JwtService;
 
-    constructor(databseProvider: DatabaseProvider) {
+    constructor(databseProvider: DatabaseProvider, jwtService: JwtService) {
         this._databaseProvider = databseProvider;
+        this._jwtService = jwtService;
     }
 
     @Post('/find')
@@ -59,7 +61,27 @@ export class UserController {
         }
 
         const result: UserType = {
+            token: this._jwtService.sign({
+                user
+            }, {
+                secret: 'cosimo',
+                expiresIn: '12h'
+            }),
             user: user
+        };
+        res.statusCode = 200;
+        res.statusMessage = '200 - Login OK';
+        res.send(ResponseUtils.user(req, res, result));
+    }
+
+    @Get('/verify')
+    public async verifyToken(@Req() req: Request, @Res() res: Response): Promise<void> {
+        const jwt: { user: UserEntity } = this._jwtService.verify<{user: UserEntity}>(req.headers['token'].toString(), {
+            secret: 'cosimo'
+        });
+        const result: UserType = {
+            token: req.headers['token'].toString(),
+            user: jwt.user
         };
         res.statusCode = 200;
         res.statusMessage = '200 - Login OK';
@@ -120,6 +142,7 @@ export class UserController {
             }
         });
         const result: UserType = {
+            token: this._jwtService.sign(inserted),
             user: inserted
         };
         res.statusCode = 200;

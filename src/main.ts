@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import helmet from 'helmet';
 import { INestApplication, Logger, NestApplicationOptions } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { VanadisModule } from './vanadis.module';
@@ -26,6 +27,7 @@ async function bootstrap(): Promise<void> {
         logger.debug('Vanadis - Debug System: Enabled');
     }
 
+    vanadis.use(helmet());
     vanadis.enableCors();
 
     await vanadis.listen(configProvider.config.http.port);
