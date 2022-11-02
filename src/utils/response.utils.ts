@@ -5,7 +5,9 @@ import { ResponseType } from '../types/response.type';
 import { StaffType } from '../types/staff.type';
 import { UserType } from '../types/user.type';
 import { ConfigProvider } from '../core/config/config.provider';
-import { NewsType } from '../types/news.type';
+import { ListType } from '../types/list.type';
+import { NewsEntity } from '../core/database/entities/news.entity';
+import { PermissionEntity } from '../core/database/entities/permission.entity';
 
 export class ResponseUtils {
     private static readonly _configProvider: ConfigProvider = new ConfigProvider();
@@ -54,7 +56,15 @@ export class ResponseUtils {
         return this.send(req, res, send);
     }
 
-    public static news(@Req() req: Request, @Res() res: Response, object: NewsType): string {
+    public static news(@Req() req: Request, @Res() res: Response, object: ListType<NewsEntity>): string {
+        let send: ResponseType = {
+            status: 'success',
+            data: object
+        }
+        return this.send(req, res, send);
+    }
+
+    public static permission(@Req() req: Request, @Res() res: Response, object: ListType<PermissionEntity>): string {
         let send: ResponseType = {
             status: 'success',
             data: object

@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { Controller, Body, Req, Res, Post, Get, Param, ConsoleLogger } from '@nestjs/common';
+import { Controller, Body, Req, Res, Post, Get, Param } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { DatabaseProvider } from '../../core/database/database.provider';
 import { ResponseUtils } from '../../utils/response.utils';
@@ -11,6 +11,8 @@ import { RoomsEntity } from '../../core/database/entities/rooms.entity';
 import { UserType } from '../../types/user.type';
 import { StaffType } from '../../types/staff.type';
 import { ProfileType } from '../../types/profile.type';
+import { PermissionEntity } from '../../core/database/entities/permission.entity';
+import { ListType } from '../../types/list.type';
 
 @Controller('/user')
 export class UserController {
@@ -95,6 +97,28 @@ export class UserController {
             res.statusMessage = '200 - Login NOT OK';
             res.send(ResponseUtils.message(req, res, 'error:Token expired!'));
         }
+    }
+
+    @Get('/permission')
+    public async getPermission(@Req() req: Request, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
+        const permissions: Array<PermissionEntity> = await this._databaseProvider.connection.getRepository<PermissionEntity>(PermissionEntity).find();
+
+        if (permissions.length == 0) {
+            res.statusCode = 404;
+            res.statusMessage = '404 - Doesn\'t have permissions';
+            res.send(ResponseUtils.message(req, res, 'error:Doesn\'t have permissions!'))
+            return;
+        }
+
+        const result: ListType<PermissionEntity> = {
+            lists: permissions
+        }
+        res.statusCode = 200;
+        res.statusMessage = '200 - Permissions OK';
+        res.send(ResponseUtils.permission(req, res, result));
     }
 
     @Post('/new')
