@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { Controller, Body, Req, Res, Post, Get, Param } from '@nestjs/common';
+import { Controller, Body, Req, Res, Post, Get, Param, ConsoleLogger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { DatabaseProvider } from '../../core/database/database.provider';
 import { ResponseUtils } from '../../utils/response.utils';
@@ -76,16 +76,25 @@ export class UserController {
 
     @Get('/verify')
     public async verifyToken(@Req() req: Request, @Res() res: Response): Promise<void> {
-        const jwt: { user: UserEntity } = this._jwtService.verify<{user: UserEntity}>(req.headers['token'].toString(), {
-            secret: 'cosimo'
-        });
-        const result: UserType = {
-            token: req.headers['token'].toString(),
-            user: jwt.user
-        };
-        res.statusCode = 200;
-        res.statusMessage = '200 - Login OK';
-        res.send(ResponseUtils.user(req, res, result));
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
+        try {
+            const jwt: { user: UserEntity } = this._jwtService.verify(req.headers['token'].toString(), {
+                secret: 'cosimo'
+            });
+            const result: UserType = {
+                token: req.headers['token'].toString(),
+                user: jwt.user
+            };
+            res.statusCode = 200;
+            res.statusMessage = '200 - Login OK';
+            res.send(ResponseUtils.user(req, res, result));
+        } catch (e) {
+            res.statusCode = 200;
+            res.statusMessage = '200 - Login NOT OK';
+            res.send(ResponseUtils.message(req, res, 'error:Token expired!'));
+        }
     }
 
     @Post('/new')
