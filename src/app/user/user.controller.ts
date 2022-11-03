@@ -169,14 +169,19 @@ export class UserController {
             registerIp: req.ip,
             currentIp: req.ip
         });
-        const inserted: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
+        const insertedUser: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
                 nickname: body.username
             }
         });
         const result: UserType = {
-            token: this._jwtService.sign(inserted),
-            user: inserted
+            token: this._jwtService.sign({
+                insertedUser
+            }, {
+                secret: 'cosimo',
+                expiresIn: '12h'
+            }),
+            user: insertedUser
         };
         res.statusCode = 200;
         res.statusMessage = '200 - Registration OK';
