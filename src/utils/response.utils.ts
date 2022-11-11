@@ -8,6 +8,7 @@ import { ConfigProvider } from '../core/config/config.provider';
 import { ListType } from '../types/list.type';
 import { NewsEntity } from '../core/database/entities/news.entity';
 import { PermissionEntity } from '../core/database/entities/permission.entity';
+import { UserSettingsType } from '../types/settings.type';
 
 export class ResponseUtils {
     private static readonly _configProvider: ConfigProvider = new ConfigProvider();
@@ -28,6 +29,14 @@ export class ResponseUtils {
         let send: ResponseType = {
             status: split[0],
             data: split[1]
+        }
+        return this.send(req, res, send);
+    }
+
+    public static setting(@Req() req: Request, @Res() res: Response, object: UserSettingsType): string {
+        let send: ResponseType = {
+            status: 'success',
+            data: object
         }
         return this.send(req, res, send);
     }

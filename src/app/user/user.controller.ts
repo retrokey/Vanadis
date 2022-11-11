@@ -1,10 +1,10 @@
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { Controller, Body, Req, Res, Post, Get, Param } from '@nestjs/common';
+import { Controller, Body, Req, Res, Post, Get, Param, Put } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { DatabaseProvider } from '../../core/database/database.provider';
 import { ResponseUtils } from '../../utils/response.utils';
-import { UserLoginDto, UserRegistrationDto } from './user.dto';
+import { UserLoginDto, UserRegistrationDto, UserSettingsDto } from './user.dto';
 import { UserEntity } from '../../core/database/entities/user.entity';
 import { FriendsEntity } from '../../core/database/entities/friends.entity';
 import { RoomsEntity } from '../../core/database/entities/rooms.entity';
@@ -13,6 +13,8 @@ import { StaffType } from '../../types/staff.type';
 import { ProfileType } from '../../types/profile.type';
 import { PermissionEntity } from '../../core/database/entities/permission.entity';
 import { ListType } from '../../types/list.type';
+import { UserSettingsEntity } from '../../core/database/entities/user_settings.entity';
+import { UserSettingsType } from '../../types/settings.type';
 
 @Controller('/user')
 export class UserController {
@@ -36,7 +38,7 @@ export class UserController {
             return;
         }
 
-        const user: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
+        const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
                 nickname: body.username
             }
@@ -47,7 +49,7 @@ export class UserController {
             res.send(ResponseUtils.message(req, res, 'error:The user ' + body.username + ' wasn\'t found!'));
             return;
         }
-        const password: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
+        const password: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             select: [
                 'password'
             ],
@@ -76,51 +78,6 @@ export class UserController {
         res.send(ResponseUtils.user(req, res, result));
     }
 
-    @Get('/verify')
-    public async verifyToken(@Req() req: Request, @Res() res: Response): Promise<void> {
-        res.header('content-type', 'application/json');
-        res.header('access-control-allow-origin', '*');
-
-        try {
-            const jwt: { user: UserEntity } = this._jwtService.verify(req.headers['token'].toString(), {
-                secret: 'cosimo'
-            });
-            const result: UserType = {
-                token: req.headers['token'].toString(),
-                user: jwt.user
-            };
-            res.statusCode = 200;
-            res.statusMessage = '200 - Login OK';
-            res.send(ResponseUtils.user(req, res, result));
-        } catch (e) {
-            res.statusCode = 200;
-            res.statusMessage = '200 - Login NOT OK';
-            res.send(ResponseUtils.message(req, res, 'error:Token expired!'));
-        }
-    }
-
-    @Get('/permission')
-    public async getPermission(@Req() req: Request, @Res() res: Response): Promise<void> {
-        res.header('content-type', 'application/json');
-        res.header('access-control-allow-origin', '*');
-
-        const permissions: Array<PermissionEntity> = await this._databaseProvider.connection.getRepository<PermissionEntity>(PermissionEntity).find();
-
-        if (permissions.length == 0) {
-            res.statusCode = 404;
-            res.statusMessage = '404 - Doesn\'t have permissions';
-            res.send(ResponseUtils.message(req, res, 'error:Doesn\'t have permissions!'))
-            return;
-        }
-
-        const result: ListType<PermissionEntity> = {
-            lists: permissions
-        }
-        res.statusCode = 200;
-        res.statusMessage = '200 - Permissions OK';
-        res.send(ResponseUtils.permission(req, res, result));
-    }
-
     @Post('/new')
     public async newUser(@Body() body: UserRegistrationDto, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
@@ -133,7 +90,7 @@ export class UserController {
             return;
         }
 
-        const user: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
+        const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
                 nickname: body.username
             }
@@ -145,7 +102,7 @@ export class UserController {
             return;
         }
 
-        const mail: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
+        const mail: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
                 mail: body.mail
             }
@@ -188,12 +145,101 @@ export class UserController {
         res.send(ResponseUtils.user(req, res, result));
     }
 
+    @Get('/verify')
+    public async verifyToken(@Req() req: Request, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
+        try {
+            const jwt: { user: UserEntity } = this._jwtService.verify(req.headers['token'].toString(), {
+                secret: 'cosimo'
+            });
+            const result: UserType = {
+                token: req.headers['token'].toString(),
+                user: jwt.user
+            };
+            res.statusCode = 200;
+            res.statusMessage = '200 - Login OK';
+            res.send(ResponseUtils.user(req, res, result));
+        } catch (e) {
+            res.statusCode = 200;
+            res.statusMessage = '200 - Login NOT OK';
+            res.send(ResponseUtils.message(req, res, 'error:Token expired!'));
+        }
+    }
+
+	@Get('/settings/:id')
+	public async getSettings(@Param('id') userId: number, @Req() req: Request, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
+        const setting: UserSettingsEntity = await this._databaseProvider.connection.getRepository(UserSettingsEntity).findOne({
+            where: {
+                user_id: userId
+            }
+        });
+
+        if (setting == null) {
+            res.statusCode = 404;
+            res.statusMessage = '404 - Settings not found';
+            res.send(ResponseUtils.message(req, res, 'error: Settings for user didn\'t find!'))
+            return;
+        }
+
+        const result: UserSettingsType = {
+            setting: setting
+        };
+        res.statusCode = 200;
+        res.statusMessage = '200 - Settings OK';
+        res.send(ResponseUtils.setting(req, res, result));
+    }
+
+    @Post('/settings/:id/update')
+    public async updateSettings(@Body() body: UserSettingsDto, @Param('id') userId: number, @Req() req: Request, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
+        await this._databaseProvider.connection.getRepository(UserSettingsEntity).update({
+            user_id: userId
+        }, {
+            blockAlerts: body.alerts,
+            blockFollowing: body.following,
+            blockFriendsRequest: body.friendrequests
+        });
+
+        res.statusCode = 200;
+        res.statusMessage = '200 - Settings OK';
+        res.send(ResponseUtils.message(req, res, 'success:Settings saved!'));
+    }
+
+    @Get('/permission')
+    public async getPermission(@Req() req: Request, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
+        const permissions: Array<PermissionEntity> = await this._databaseProvider.connection.getRepository(PermissionEntity).find();
+
+        if (permissions.length == 0) {
+            res.statusCode = 404;
+            res.statusMessage = '404 - Doesn\'t have permissions';
+            res.send(ResponseUtils.message(req, res, 'error:Doesn\'t have permissions!'))
+            return;
+        }
+
+        const result: ListType<PermissionEntity> = {
+            lists: permissions
+        }
+        res.statusCode = 200;
+        res.statusMessage = '200 - Permissions OK';
+        res.send(ResponseUtils.permission(req, res, result));
+    }
+
     @Get('/rank/:rank')
     public async getStaff(@Param('rank') rankId: string, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
-        const user: Array<UserEntity> = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).find({
+        const user: Array<UserEntity> = await this._databaseProvider.connection.getRepository(UserEntity).find({
             where: {
                 rank: parseInt(rankId)
             },
@@ -225,7 +271,7 @@ export class UserController {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
-        const user: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
+        const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
             where: {
                 nickname: username
             },
@@ -240,7 +286,7 @@ export class UserController {
             return;
         }
 
-        const friends: Array<FriendsEntity> = await this._databaseProvider.connection.getRepository<FriendsEntity>(FriendsEntity).find({
+        const friends: Array<FriendsEntity> = await this._databaseProvider.connection.getRepository(FriendsEntity).find({
             where: {
                 user_one_id: user.id
             },
@@ -248,7 +294,7 @@ export class UserController {
         });
         const friendsArray: Array<UserEntity> = new Array<UserEntity>();
         for (let friend of friends) {
-            const user: UserEntity = await this._databaseProvider.connection.getRepository<UserEntity>(UserEntity).findOne({
+            const user: UserEntity = await this._databaseProvider.connection.getRepository(UserEntity).findOne({
                 where: {
                     id: friend.user_two_id
                 },
@@ -260,7 +306,7 @@ export class UserController {
             friendsArray.push(user);
         }
 
-        const rooms: Array<RoomsEntity> = await this._databaseProvider.connection.getRepository<RoomsEntity>(RoomsEntity).find({
+        const rooms: Array<RoomsEntity> = await this._databaseProvider.connection.getRepository(RoomsEntity).find({
             select: [
                 'id',
                 'roomName',
@@ -272,14 +318,7 @@ export class UserController {
             take: 2
         });
 
-        let options: any = {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        };
-        let date: string = new Date(user.accountCreation * 1000).toLocaleDateString('it-IT', options);
         const result: ProfileType = {
-            registration: date,
             user: user,
             friends: friendsArray,
             rooms: rooms

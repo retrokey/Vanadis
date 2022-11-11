@@ -18,7 +18,7 @@ export class NewsController {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
-        const newsLists: Array<NewsEntity> = await this._databaseProvider.connection.getRepository<NewsEntity>(NewsEntity).find({
+        const newsLists: Array<NewsEntity> = await this._databaseProvider.connection.getRepository(NewsEntity).find({
             relations: [
                 'author'
             ],

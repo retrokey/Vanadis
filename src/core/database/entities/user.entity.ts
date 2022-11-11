@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm';
 import { FriendsEntity } from './friends.entity';
 import { RoomsEntity } from './rooms.entity';
-import { UserCurrencyEntity } from './users_currency.entity';
+import { UserCurrencyEntity } from './user_currency.entity';
 
 @Entity('users')
 export class UserEntity {

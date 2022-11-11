@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { ConfigProvider } from '../config/config.provider';
 import { UserEntity } from './entities/user.entity';
-import { UserCurrencyEntity } from './entities/users_currency.entity';
+import { UserCurrencyEntity } from './entities/user_currency.entity';
+import { UserSettingsEntity } from './entities/user_settings.entity';
 import { FriendsEntity } from './entities/friends.entity';
 import { RoomsEntity } from './entities/rooms.entity';
 import { NewsEntity } from './entities/news.entity';
@@ -33,6 +34,7 @@ export class DatabaseProvider {
             entities: [
                 UserEntity,
                 UserCurrencyEntity,
+                UserSettingsEntity,
                 FriendsEntity,
                 RoomsEntity,
                 NewsEntity,
