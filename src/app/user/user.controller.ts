@@ -16,7 +16,7 @@ import { ListType } from '../../types/list.type';
 import { UserSettingsEntity } from '../../core/database/entities/user_settings.entity';
 import { UserSettingsType } from '../../types/settings.type';
 
-@Controller('/user')
+@Controller('user')
 export class UserController {
     private readonly _databaseProvider: DatabaseProvider;
     private readonly _jwtService: JwtService;
@@ -26,7 +26,7 @@ export class UserController {
         this._jwtService = jwtService;
     }
 
-    @Post('/find')
+    @Post('find')
     public async getUser(@Body() body: UserLoginDto, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
@@ -78,7 +78,7 @@ export class UserController {
         res.send(ResponseUtils.user(req, res, result));
     }
 
-    @Post('/new')
+    @Post('new')
     public async newUser(@Body() body: UserRegistrationDto, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
@@ -145,7 +145,7 @@ export class UserController {
         res.send(ResponseUtils.user(req, res, result));
     }
 
-    @Get('/verify')
+    @Get('verify')
     public async verifyToken(@Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
@@ -168,7 +168,7 @@ export class UserController {
         }
     }
 
-	@Get('/settings/:id')
+	@Get('settings/:id')
 	public async getSettings(@Param('id') userId: number, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
@@ -194,7 +194,7 @@ export class UserController {
         res.send(ResponseUtils.setting(req, res, result));
     }
 
-    @Post('/settings/:id/update')
+    @Put('settings/:id/update')
     public async updateSettings(@Body() body: UserSettingsDto, @Param('id') userId: number, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
@@ -212,7 +212,7 @@ export class UserController {
         res.send(ResponseUtils.message(req, res, 'success:Settings saved!'));
     }
 
-    @Get('/permission')
+    @Get('permission')
     public async getPermission(@Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
@@ -234,7 +234,7 @@ export class UserController {
         res.send(ResponseUtils.permission(req, res, result));
     }
 
-    @Get('/rank/:rank')
+    @Get('rank/:rank')
     public async getStaff(@Param('rank') rankId: string, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
@@ -266,7 +266,7 @@ export class UserController {
         res.send(ResponseUtils.staff(req, res, result));
     }
 
-    @Get('/profile/:username')
+    @Get('profile/:username')
     public async getProfile(@Param('username') username: string, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');

@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Req, Res } from '@nestjs/common';
 import { DatabaseProvider } from '../../core/database/database.provider';
 import { NewsEntity } from '../../core/database/entities/news.entity';
 import { ResponseUtils } from '../../utils/response.utils';
 import { ListType } from '../../types/list.type';
 
-@Controller('/news')
+@Controller('news')
 export class NewsController {
     private readonly _databaseProvider: DatabaseProvider;
 
@@ -13,7 +13,7 @@ export class NewsController {
         this._databaseProvider = databseProvider;
     }
 
-    @Get('/lists')
+    @Get('lists')
     public async getNewsList(@Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
@@ -43,7 +43,7 @@ export class NewsController {
         res.send(ResponseUtils.news(req, res, result));
     }
 
-    @Get('/remove/:id')
+    @Delete('remove/:id')
     public async removeNews(@Param('id') newsId: number, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
