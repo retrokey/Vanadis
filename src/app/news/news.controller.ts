@@ -42,4 +42,31 @@ export class NewsController {
         res.statusMessage = '200 - News List OK';
         res.send(ResponseUtils.news(req, res, result));
     }
+
+    @Get('/remove/:id')
+    public async removeNews(@Param('id') newsId: number, @Req() req: Request, @Res() res: Response): Promise<void> {
+        res.header('content-type', 'application/json');
+        res.header('access-control-allow-origin', '*');
+
+        const news: NewsEntity = await this._databaseProvider.connection.getRepository(NewsEntity).findOne({
+            relations: [
+                'author'
+            ],
+            where: {
+                id: newsId
+            }
+        });
+
+        if (news == null) {
+            res.statusCode = 404;
+            res.statusMessage = '404 - News NOT OK';
+            res.send(ResponseUtils.message(req, res, 'error:The news was didn\'t find!'))
+            return;
+        }
+
+        await this._databaseProvider.connection.getRepository(NewsEntity).remove(news);
+        res.statusCode = 200;
+        res.statusMessage = '200 - News OK';
+        res.send(ResponseUtils.message(req, res, 'success:News was successfully deleted!'));
+    }
 }
