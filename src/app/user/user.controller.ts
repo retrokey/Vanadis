@@ -15,6 +15,7 @@ import { PermissionEntity } from '../../core/database/entities/permission.entity
 import { ListType } from '../../types/list.type';
 import { UserSettingsEntity } from '../../core/database/entities/user_settings.entity';
 import { UserSettingsType } from '../../types/settings.type';
+import { PermissionType } from '../../types/permission.type';
 
 @Controller('user')
 export class UserController {
@@ -212,12 +213,19 @@ export class UserController {
         res.send(ResponseUtils.message(req, res, 'success:Settings saved!'));
     }
 
-    @Get('permission')
-    public async getPermission(@Req() req: Request, @Res() res: Response): Promise<void> {
+    @Get('permission/:id')
+    public async getPermission(@Param('id') rankId: number, @Req() req: Request, @Res() res: Response): Promise<void> {
         res.header('content-type', 'application/json');
         res.header('access-control-allow-origin', '*');
 
-        const permissions: Array<PermissionEntity> = await this._databaseProvider.connection.getRepository(PermissionEntity).find();
+        const permissions: Array<PermissionEntity> = await this._databaseProvider.connection.getRepository(PermissionEntity).find({
+            where: {
+                rankId: rankId
+            },
+            relations: [
+                'permission'
+            ]
+        });
 
         if (permissions.length == 0) {
             res.statusCode = 404;
@@ -226,12 +234,21 @@ export class UserController {
             return;
         }
 
-        const result: ListType<PermissionEntity> = {
-            lists: permissions
+        let permissionArray: Array<PermissionType> = new Array<PermissionType>();
+        for (let permission of permissions) {
+            let permissionInfo: PermissionType = {
+                name: permission.permission.name,
+                state: true
+            }
+            permissionArray.push(permissionInfo);
+        }
+
+        const result: ListType<PermissionType> = {
+            lists: permissionArray
         }
         res.statusCode = 200;
         res.statusMessage = '200 - Permissions OK';
-        res.send(ResponseUtils.permission(req, res, result));
+        res.send(ResponseUtils.list<PermissionType>(req, res, result));
     }
 
     @Get('rank/:rank')

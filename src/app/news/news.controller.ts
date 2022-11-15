@@ -40,7 +40,7 @@ export class NewsController {
         }
         res.statusCode = 200;
         res.statusMessage = '200 - News List OK';
-        res.send(ResponseUtils.news(req, res, result));
+        res.send(ResponseUtils.list<NewsEntity>(req, res, result));
     }
 
     @Delete('remove/:id')

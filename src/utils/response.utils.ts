@@ -9,6 +9,7 @@ import { ListType } from '../types/list.type';
 import { NewsEntity } from '../core/database/entities/news.entity';
 import { PermissionEntity } from '../core/database/entities/permission.entity';
 import { UserSettingsType } from '../types/settings.type';
+import { PermissionType } from '../types/permission.type';
 
 export class ResponseUtils {
     private static readonly _configProvider: ConfigProvider = new ConfigProvider();
@@ -65,15 +66,7 @@ export class ResponseUtils {
         return this.send(req, res, send);
     }
 
-    public static news(@Req() req: Request, @Res() res: Response, object: ListType<NewsEntity>): string {
-        let send: ResponseType = {
-            status: 'success',
-            data: object
-        }
-        return this.send(req, res, send);
-    }
-
-    public static permission(@Req() req: Request, @Res() res: Response, object: ListType<PermissionEntity>): string {
+    public static list<T>(@Req() req: Request, @Res() res: Response, object: ListType<T>): string {
         let send: ResponseType = {
             status: 'success',
             data: object

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { PermissionNameEntity } from './permission_name.entity';
 
 @Entity('mythical_permission')
 export class PermissionEntity {
@@ -10,15 +11,17 @@ export class PermissionEntity {
     @Column({
         name: 'permission'
     })
-    public name: string;
+    public permissionId: number;
 
     @Column({
         name: 'rank'
     })
     public rankId: number;
 
-    @Column({
-        name: 'description'
+    @OneToOne(() => PermissionNameEntity)
+    @JoinColumn({
+        name: 'permission',
+        referencedColumnName: 'id'
     })
-    public desc: string;
+    permission: PermissionNameEntity;
 }

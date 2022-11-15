@@ -1,7 +1,7 @@
 this._rconProvider.send({
     key: 'hotelalert',
     data: {
-        message: ''
+        message: 'Welcome to Mythical!'
     }
 });
 
